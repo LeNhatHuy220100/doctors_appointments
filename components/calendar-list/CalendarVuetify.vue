@@ -159,7 +159,7 @@ export default defineComponent({
       extendOriginal.value = null;
 
       // console.log(changed_event);
-      // saveData(changed_event);
+      saveData(changed_event);
     };
 
     const cancelDrag = function () {
@@ -179,7 +179,7 @@ export default defineComponent({
       dragEvent.value = null;
 
       // console.log(changed_event);
-      // saveData(changed_event);
+      saveData(changed_event);
     };
 
     const extendBottom = function (event) {
@@ -193,8 +193,8 @@ export default defineComponent({
 
       doctor.value.appoitment_calendar.forEach((app) => {
         if (app.appointment_id === event.id) {
-          app.start_time = new Date(event.start);
-          app.end_time = new Date(event.end);
+          app.start_time = convertDateTime(new Date(event.start));
+          app.end_time = convertDateTime(new Date(event.end));
         }
       });
 
@@ -207,6 +207,23 @@ export default defineComponent({
       });
 
       localStorage.setItem("doctors", JSON.stringify(doctors));
+    };
+
+    const convertDateTime = (date) => {
+      const convertedDate =
+        date.getFullYear() +
+        "-" +
+        date.getMonth() +
+        1 +
+        "-" +
+        date.getDate() +
+        " " +
+        date.getHours() +
+        ":" +
+        date.getMinutes() +
+        ":" +
+        date.getSeconds();
+      return convertedDate;
     };
 
     return {
