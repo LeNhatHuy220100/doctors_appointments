@@ -1,4 +1,4 @@
-# nuxt-ex
+#doctors_appointments
 
 ## Build Setup
 
