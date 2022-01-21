@@ -24,7 +24,11 @@
           </template> -->
 
           <template v-slot:event="{ event, timed, eventSummary }">
-            <div class="v-event-draggable" v-html="eventSummary()"></div>
+            <div
+              class="v-event-draggable"
+              v-html="eventSummary()"
+              style="color: white"
+            ></div>
             <div
               v-if="timed"
               class="v-event-drag-bottom"
@@ -37,23 +41,23 @@
   </v-row>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, ref, toRefs } from "@nuxtjs/composition-api";
 
 export default defineComponent({
   props: ["doctor"],
   setup(props) {
-    const { doctor } = toRefs(props);
-    let value = ref("");
-    let events = ref([]);
-    const today = ref("2022-01-12");
-    const dragEvent = ref(null);
-    const dragStart = ref(null);
-    const dragTime = ref(null);
-    const createEvent = ref(null);
-    const createStart = ref(null);
-    const extendOriginal = ref(null);
-    let changed_event = ref(null);
+    const { doctor }: { doctor?: any } = toRefs(props);
+    let value: any = ref("");
+    let events: any = ref([]);
+    const today: any = ref("2022-01-12");
+    const dragEvent: any = ref(null);
+    const dragStart: any = ref(null);
+    const dragTime: any = ref(null);
+    const createEvent: any = ref(null);
+    const createStart: any = ref(null);
+    const extendOriginal: any = ref(null);
+    let changed_event: any = ref(null);
 
     const getEvents = () => {
       let curr_events = [];
@@ -73,7 +77,7 @@ export default defineComponent({
       events.value = curr_events;
     };
 
-    const toTime = function (tms) {
+    const toTime = function (tms: any) {
       return new Date(
         tms.year,
         tms.month - 1,
@@ -83,7 +87,7 @@ export default defineComponent({
       ).getTime();
     };
 
-    const roundTime = function (time, down = true) {
+    const roundTime = function (time: any, down = true) {
       const roundTo = 15; // minutes
       const roundDownTime = roundTo * 60 * 1000;
       return down
@@ -91,27 +95,27 @@ export default defineComponent({
         : time + (roundDownTime - (time % roundDownTime));
     };
 
-    const getEventColor = function (event) {
+    const getEventColor = function (event: any) {
       const rgb = parseInt(event.color.substring(1), 16);
       const r = (rgb >> 16) & 0xff;
       const g = (rgb >> 8) & 0xff;
       const b = (rgb >> 0) & 0xff;
-      return event === this.dragEvent
+      return event === dragEvent
         ? `rgba(${r}, ${g}, ${b}, 0.7)`
-        : event === this.createEvent
+        : event === createEvent
         ? `rgba(${r}, ${g}, ${b}, 0.7)`
         : event.color;
     };
 
-    const rnd = function (a, b) {
+    const rnd = function (a: any, b: any) {
       return Math.floor((b - a + 1) * Math.random()) + a;
     };
 
-    const rndElement = function (arr) {
-      return arr[this.rnd(0, arr.length - 1)];
+    const rndElement = function (arr: any) {
+      return arr[rnd(0, arr.length - 1)];
     };
 
-    const startDrag = function ({ event, timed }) {
+    const startDrag = function ({ event, timed }: { event: any; timed: any }) {
       if (event && timed) {
         dragEvent.value = event;
         dragTime.value = null;
@@ -119,7 +123,7 @@ export default defineComponent({
       }
     };
 
-    const startTime = function (tms) {
+    const startTime = function (tms: any) {
       const mouse = toTime(tms);
       if (dragEvent.value && dragTime.value === null) {
         const start = dragEvent.value.start;
@@ -127,7 +131,7 @@ export default defineComponent({
       }
     };
 
-    const mouseMove = function (tms) {
+    const mouseMove = function (tms: any) {
       const mouse = toTime(tms);
       if (dragEvent.value && dragTime.value !== null) {
         const start = dragEvent.value.start;
@@ -182,16 +186,16 @@ export default defineComponent({
       saveData(changed_event);
     };
 
-    const extendBottom = function (event) {
+    const extendBottom = function (event: any) {
       createEvent.value = event;
       createStart.value = event.start;
       extendOriginal.value = event.end;
     };
 
-    const saveData = (event) => {
+    const saveData = (event: any) => {
       const doctors = JSON.parse(localStorage.getItem("doctors") || "");
 
-      doctor.value.appoitment_calendar.forEach((app) => {
+      doctor.value.appoitment_calendar.forEach((app: any) => {
         if (app.appointment_id === event.id) {
           app.start_time = convertDateTime(new Date(event.start));
           app.end_time = convertDateTime(new Date(event.end));
@@ -200,7 +204,7 @@ export default defineComponent({
 
       // console.log(doctor);
 
-      doctors.forEach((doc) => {
+      doctors.forEach((doc: any) => {
         if (doc.doctor_id === doctor.value.doctor_id) {
           doc.appoitment_calendar = [...doctor.value.appoitment_calendar];
         }
@@ -209,7 +213,7 @@ export default defineComponent({
       localStorage.setItem("doctors", JSON.stringify(doctors));
     };
 
-    const convertDateTime = (date) => {
+    const convertDateTime = (date: any) => {
       const convertedDate =
         date.getFullYear() +
         "-" +

@@ -16,20 +16,20 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent, computed, ref, toRefs } from "@vue/composition-api";
 
 export default defineComponent({
   props: ["appointments"],
   setup(props) {
-    const { appointments } = toRefs(props);
+    const { appointments }: { appointments?: any } = toRefs(props);
 
-    const startTime = (time) => {
+    const startTime = (time: any) => {
       let time_detail = time.split(" ")[1].split(":");
       return [time_detail[0], time_detail[1]].join(":");
     };
 
-    const isRightTime = (time, calendar) => {
+    const isRightTime = (time: any, calendar: any) => {
       const appointmentTime = startTime(calendar.start_time);
       return time === appointmentTime;
     };
@@ -41,8 +41,8 @@ export default defineComponent({
         listTime.push(startTime(app.start_time));
       }
 
-      listTime = new Set(listTime);
-      return listTime;
+      let setTime = new Set(listTime);
+      return setTime;
     });
 
     return { isRightTime, startTime, timeList };
