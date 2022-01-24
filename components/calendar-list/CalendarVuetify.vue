@@ -1,6 +1,7 @@
 <template>
   <v-row class="fill-height">
     <v-col>
+      <State :tags="tags" :getTag="getTag" />
       <v-sheet height="600">
         <v-calendar
           color="#B2DFDB"
@@ -42,14 +43,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, toRefs } from "@nuxtjs/composition-api";
+import { defineComponent, ref, toRefs, watch } from "@nuxtjs/composition-api";
 
 export default defineComponent({
   props: ["doctor"],
   setup(props) {
     const { doctor }: { doctor?: any } = toRefs(props);
+
     let value: any = ref("");
     let events: any = ref([]);
+    let fullEvents: any = ref([]);
     const today: any = ref("2022-01-12");
     const dragEvent: any = ref(null);
     const dragStart: any = ref(null);
@@ -57,10 +60,34 @@ export default defineComponent({
     const createEvent: any = ref(null);
     const createStart: any = ref(null);
     const extendOriginal: any = ref(null);
+    const tags = ref(["All", "Passed", "Pending", "Approved"]);
+    const currTag = ref("All");
     let changed_event: any = ref(null);
+
+    const getTag = (tag: any) => {
+      currTag.value = tag;
+    };
+
+    const getAppointmentByTag = (tag: any) => {
+      return fullEvents.value.filter((e: any) => {
+        if (e.status === tag) {
+          return e;
+        }
+      });
+    };
+
+    watch(currTag, () => {
+      let filteredAppointment = fullEvents.value;
+      if (currTag.value.toLowerCase() !== "all") {
+        filteredAppointment = getAppointmentByTag(currTag.value.toLowerCase());
+      }
+      events.value = filteredAppointment;
+      console.log(filteredAppointment, fullEvents.value);
+    });
 
     const getEvents = () => {
       let curr_events = [];
+
       for (let app of doctor.value.appoitment_calendar) {
         let newObj = {
           name: app.requester,
@@ -68,13 +95,16 @@ export default defineComponent({
           end: Date.parse(app.end_time),
           color: app.color_code,
           timed: true,
+          status: app.status,
           symptom: app.symptom,
           avatar: app.avatar,
           id: app.appointment_id,
         };
         curr_events.push(newObj);
       }
+
       events.value = curr_events;
+      fullEvents.value = curr_events;
     };
 
     const toTime = function (tms: any) {
@@ -105,14 +135,6 @@ export default defineComponent({
         : event === createEvent
         ? `rgba(${r}, ${g}, ${b}, 0.7)`
         : event.color;
-    };
-
-    const rnd = function (a: any, b: any) {
-      return Math.floor((b - a + 1) * Math.random()) + a;
-    };
-
-    const rndElement = function (arr: any) {
-      return arr[rnd(0, arr.length - 1)];
     };
 
     const startDrag = function ({ event, timed }: { event: any; timed: any }) {
@@ -202,8 +224,6 @@ export default defineComponent({
         }
       });
 
-      // console.log(doctor);
-
       doctors.forEach((doc: any) => {
         if (doc.doctor_id === doctor.value.doctor_id) {
           doc.appoitment_calendar = [...doctor.value.appoitment_calendar];
@@ -242,6 +262,8 @@ export default defineComponent({
       getEventColor,
       extendBottom,
       value,
+      tags,
+      getTag,
     };
   },
 });

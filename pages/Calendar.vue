@@ -1,22 +1,42 @@
 <template>
   <div id="calendar">
-    <Header :title="`Lịch Khám`" :doctorId="doctor.doctor_id" />
-    <CalendarVuetify :doctor="doctor" />
-    <Footer />
+    <Header :title="`Lịch Khám`" :doctorId="doctor_id" />
+    <CalendarVuetify
+      v-if="docs && docs.length > 0"
+      :doctor="getDoctor(doctor_id, docs)"
+    />
   </div>
 </template>
 
 <script>
-import { defineComponent } from "@nuxtjs/composition-api";
+import {
+  defineComponent,
+  onMounted,
+  ref,
+  useRoute,
+} from "@nuxtjs/composition-api";
 
 export default defineComponent({
-  asyncData({ query }) {
-    const doctor_id = query.id;
-    const doctors = JSON.parse(localStorage.getItem("doctors") || "");
-    const doctor = doctors.find((doc) => doc.doctor_id === Number(doctor_id));
-    return { doctor };
+  setup() {
+    const route = useRoute();
+    const docs = ref([]);
+    const doctor_id = ref(route.value.query.id);
+
+    const getDoctor = (id, list) => {
+      let doctor = {};
+      if (list && list.length >= 0) {
+        doctor = list.find((doc) => doc.doctor_id === Number(id));
+      }
+
+      return doctor;
+    };
+
+    onMounted(() => {
+      docs.value = JSON.parse(localStorage.getItem("doctors") || "");
+    });
+
+    return { doctor_id, getDoctor, docs };
   },
-  setup() {},
 });
 </script>
 
